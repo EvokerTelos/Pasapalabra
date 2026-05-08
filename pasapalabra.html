@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pasapalabra - Parentalidad Positiva</title>
+
+  <style>
+    :root {
+      --azul-ong: #2F3478;
+      --violeta: #4B4F9F;
+      --turquesa: #39C3B1;
+      --amarillo: #FFD43B;
+      --rojo: #F45B7A;
+      --fondo-1: #F7F4FF;
+      --fondo-2: #E7F7F3;
+      --gris: #7377B6;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, var(--fondo-1), var(--fondo-2));
+      color: var(--azul-ong);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .intro-screen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      z-index: 10;
+      background: linear-gradient(135deg, var(--fondo-1), var(--fondo-2));
+    }
+
+    .intro-card {
+      width: min(92vw, 560px);
+      padding: 42px 34px;
+      text-align: center;
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(75,79,159,.18);
+      border-radius: 28px;
+      box-shadow: 0 12px 30px rgba(47,52,120,.18);
+    }
+
+    .intro-logo { width: 190px; max-width: 70%; }
+
+    .intro-card h1 {
+      margin: 22px 0 10px;
+      font-size: clamp(30px, 5vw, 44px);
+      line-height: 1.12;
+    }
+
+    .intro-card p {
+      margin: 0 0 30px;
+      font-size: 18px;
+      color: #5E629C;
+    }
+
+    .start-btn, button {
+      border: none;
+      border-radius: 14px;
+      padding: 13px 18px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform .15s ease, filter .15s ease;
+    }
+
+    button:hover, .start-btn:hover { transform: translateY(-1px); filter: brightness(1.02); }
+    button:active, .start-btn:active { transform: translateY(0); }
+
+    .start-btn {
+      background: var(--amarillo);
+      color: var(--azul-ong);
+      font-size: 20px;
+      padding: 16px 30px;
+      box-shadow: 0 6px 18px rgba(47,52,120,.16);
+    }
+
+    .app {
+      width: 100%;
+      min-height: 100vh;
+      max-width: 1220px;
+      margin: 0 auto;
+      padding: 30px 22px;
+      display: none;
+      grid-template-columns: minmax(430px, 1fr) 420px;
+      gap: 34px;
+      align-items: center;
+    }
+
+    .rosco-container {
+      position: relative;
+      width: min(72vh, 650px, 92vw);
+      aspect-ratio: 1;
+      margin: auto;
+    }
+
+    .center-logo {
+      position: absolute;
+      width: 42%;
+      max-width: 250px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1;
+      filter: drop-shadow(0 4px 12px rgba(47,52,120,.22));
+      pointer-events: none;
+    }
+
+    .letter {
+      position: absolute;
+      width: clamp(42px, 6vw, 58px);
+      height: clamp(42px, 6vw, 58px);
+      border-radius: 50%;
+      background: var(--violeta);
+      border: 3px solid var(--turquesa);
+      color: white;
+      font-size: clamp(23px, 3.4vw, 32px);
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 4px 12px rgba(47,52,120,.25);
+      transition: background .18s ease, transform .18s ease, border-color .18s ease;
+      z-index: 2;
+    }
+
+    .letter.active {
+      background: var(--amarillo);
+      color: var(--azul-ong);
+      border-color: white;
+      transform: translate(-50%, -50%) scale(1.14);
+      z-index: 3;
+    }
+
+    .letter.correct { background: var(--turquesa); border-color: #B9F2EA; }
+    .letter.wrong { background: var(--rojo); border-color: #FFD0DA; }
+    .letter.passed { background: var(--gris); border-color: #D8DAFF; }
+
+    .panel {
+      background: rgba(255,255,255,.86);
+      border: 1px solid rgba(75,79,159,.22);
+      border-radius: 22px;
+      padding: 26px;
+      box-shadow: 0 10px 28px rgba(47,52,120,.18);
+    }
+
+    h1 { margin: 0 0 18px; font-size: 32px; }
+    .small { margin: 0 0 18px; color: #3B3F86; font-size: 15px; line-height: 1.42; }
+
+    .score {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin: 16px 0 22px;
+      text-align: center;
+    }
+
+    .score div {
+      background: rgba(75,79,159,.14);
+      padding: 11px;
+      border-radius: 12px;
+      font-size: 17px;
+    }
+
+    .current-letter { font-size: 56px; font-weight: bold; margin: 0 0 8px; }
+    .definition { font-size: 20px; line-height: 1.45; min-height: 92px; }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 13px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(75,79,159,.18);
+      margin-top: 12px;
+      font-size: 16px;
+      color: var(--azul-ong);
+      background: white;
+      outline: none;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--turquesa);
+      box-shadow: 0 0 0 3px rgba(57,195,177,.18);
+    }
+
+    .btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .primary { background: var(--amarillo); color: var(--azul-ong); }
+    .secondary { background: var(--turquesa); color: white; }
+    .danger { width: 100%; background: var(--rojo); color: white; }
+
+    .editor-note {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 12px;
+      background: rgba(57,195,177,.12);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 920px) {
+      .app { grid-template-columns: 1fr; gap: 22px; }
+      .rosco-container { width: min(88vw, 560px); }
+      .panel { width: min(92vw, 560px); margin: auto; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="intro-screen" id="introScreen">
+    <div class="intro-card">
+      <img src="assets/logo_ong_el_conquistador.png" class="intro-logo" alt="ONG El Conquistador">
+      <h1>Bienvenidos al Pasapalabra de<br>Parentalidad Positiva</h1>
+      <p>ONG El Conquistador · AFT-PF</p>
+      <button class="start-btn" id="startButton">Comenzar juego</button>
+    </div>
+  </div>
+
+  <audio id="introMusic" src="assets/intro.mp3" preload="auto"></audio>
+  <audio id="correctSound" src="assets/correct.mp3" preload="auto"></audio>
+  <audio id="wrongSound" src="assets/answer-wrong.mp3" preload="auto"></audio>
+
+  <main class="app" id="gameApp">
+    <section class="rosco-container" id="roscoContainer">
+      <img class="center-logo" src="assets/logo_ong_el_conquistador.png" alt="ONG El Conquistador" />
+    </section>
+
+    <section class="panel">
+      <h1>Pasapalabra Interactivo</h1>
+      <p class="small">Escribe la respuesta. Si aciertas, la letra queda verde. Si fallas, roja. También puedes pasar la palabra.</p>
+
+      <div class="score">
+        <div>✅<br><span id="ok">0</span></div>
+        <div>❌<br><span id="bad">0</span></div>
+        <div>⏭️<br><span id="skip">0</span></div>
+      </div>
+
+      <div class="current-letter" id="currentLetter">A</div>
+      <div class="definition" id="definition"></div>
+
+      <input id="answer" placeholder="Escribe tu respuesta..." autocomplete="off" />
+
+      <div class="btn-row">
+        <button class="primary" id="answerButton">Responder</button>
+        <button class="secondary" id="passButton">Pasapalabra</button>
+      </div>
+
+      <button class="danger" id="resetButton">Reiniciar juego</button>
+
+      <div class="editor-note">
+        Para modificar palabras y definiciones de forma permanente, abre el archivo <strong>preguntas.json</strong> en Visual Studio Code, guarda los cambios y vuelve a abrir el juego.
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const letters = ['A','B','C','D','E','F','G','H','I','J','L','M','N','Ñ','O','P','Q','R','S','T','U','V','X','Y','Z'];
+
+    let words = {};
+
+    const state = {
+      currentIndex: 0,
+      status: {},
+      letterElements: {},
+      started: false
+    };
+
+    const el = {
+      introScreen: document.getElementById('introScreen'),
+      gameApp: document.getElementById('gameApp'),
+      roscoContainer: document.getElementById('roscoContainer'),
+      currentLetter: document.getElementById('currentLetter'),
+      definition: document.getElementById('definition'),
+      answer: document.getElementById('answer'),
+      ok: document.getElementById('ok'),
+      bad: document.getElementById('bad'),
+      skip: document.getElementById('skip'),
+      introMusic: document.getElementById('introMusic'),
+      correctSound: document.getElementById('correctSound'),
+      wrongSound: document.getElementById('wrongSound')
+    };
+
+    async function loadQuestions() {
+      try {
+        const response = await fetch('preguntas.json?v=' + Date.now());
+        if (!response.ok) throw new Error('No se pudo cargar preguntas.json');
+        words = await response.json();
+      } catch (error) {
+        alert('No se pudo cargar preguntas.json. Abre el juego con Live Server en Visual Studio Code o revisa que el archivo esté en la misma carpeta.');
+      }
+    }
+
+    function normalize(text) {
+      return text.toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function safePlay(audio, volume = 0.55) {
+      audio.pause();
+      audio.currentTime = 0;
+      audio.volume = volume;
+      audio.play().catch(() => {});
+    }
+
+    function createRosco() {
+      letters.forEach((letter) => {
+        const node = document.createElement('div');
+        node.className = 'letter';
+        node.textContent = letter;
+        el.roscoContainer.appendChild(node);
+        state.letterElements[letter] = node;
+      });
+      positionLetters();
+    }
+
+    function positionLetters() {
+      const size = el.roscoContainer.clientWidth;
+      const center = size / 2;
+      const radius = center - 34;
+
+      letters.forEach((letter, index) => {
+        const angle = -90 + (360 / letters.length) * index;
+        const x = center + radius * Math.cos(angle * Math.PI / 180);
+        const y = center + radius * Math.sin(angle * Math.PI / 180);
+        const node = state.letterElements[letter];
+        node.style.left = `${x}px`;
+        node.style.top = `${y}px`;
+      });
+    }
+
+    function refreshLetters() {
+      letters.forEach((letter, index) => {
+        const node = state.letterElements[letter];
+        node.className = 'letter';
+        if (state.status[letter]) node.classList.add(state.status[letter]);
+        if (index === state.currentIndex) node.classList.add('active');
+      });
+    }
+
+    function updateScore() {
+      const values = Object.values(state.status);
+      el.ok.textContent = values.filter(value => value === 'correct').length;
+      el.bad.textContent = values.filter(value => value === 'wrong').length;
+      el.skip.textContent = values.filter(value => value === 'passed').length;
+    }
+
+    function loadQuestion() {
+      const letter = letters[state.currentIndex];
+      el.currentLetter.textContent = letter;
+      el.definition.textContent = words[letter]?.definition || 'Sin definición asignada.';
+      el.answer.value = '';
+      updateScore();
+      refreshLetters();
+      requestAnimationFrame(() => el.answer.focus());
+    }
+
+    function findNextPending() {
+      for (let i = 1; i <= letters.length; i++) {
+        const nextIndex = (state.currentIndex + i) % letters.length;
+        const nextLetter = letters[nextIndex];
+        if (state.status[nextLetter] !== 'correct' && state.status[nextLetter] !== 'wrong') {
+          return nextIndex;
+        }
+      }
+      return null;
+    }
+
+    function moveNext() {
+      const next = findNextPending();
+      if (next === null) {
+        updateScore();
+        refreshLetters();
+        setTimeout(() => alert('Juego terminado'), 120);
+        return;
+      }
+      state.currentIndex = next;
+      loadQuestion();
+    }
+
+    function checkAnswer() {
+      const letter = letters[state.currentIndex];
+      const userAnswer = normalize(el.answer.value);
+      const correctAnswer = normalize(words[letter]?.word || '');
+
+      if (!userAnswer) return;
+
+      if (userAnswer === correctAnswer) {
+        state.status[letter] = 'correct';
+        safePlay(el.correctSound, 0.75);
+      } else {
+        state.status[letter] = 'wrong';
+        safePlay(el.wrongSound, 0.75);
+      }
+
+      updateScore();
+      refreshLetters();
+      setTimeout(moveNext, 280);
+    }
+
+    function passWord() {
+      const letter = letters[state.currentIndex];
+      if (!state.status[letter]) state.status[letter] = 'passed';
+      moveNext();
+    }
+
+    function resetGame() {
+      state.currentIndex = 0;
+      state.status = {};
+      loadQuestion();
+    }
+
+    function startGame() {
+      if (state.started) return;
+      state.started = true;
+
+      safePlay(el.introMusic, 0.45);
+      el.introScreen.style.display = 'none';
+      el.gameApp.style.display = 'grid';
+
+      requestAnimationFrame(() => {
+        positionLetters();
+        loadQuestion();
+      });
+    }
+
+    document.getElementById('startButton').addEventListener('click', startGame);
+    document.getElementById('answerButton').addEventListener('click', checkAnswer);
+    document.getElementById('passButton').addEventListener('click', passWord);
+    document.getElementById('resetButton').addEventListener('click', resetGame);
+
+    el.answer.addEventListener('keydown', event => {
+      if (event.key === 'Enter') checkAnswer();
+    });
+
+    window.addEventListener('resize', () => {
+      if (state.started) positionLetters();
+    });
+
+    async function init() {
+      await loadQuestions();
+      createRosco();
+    }
+
+    init();
+  </script>
+</body>
+</html>

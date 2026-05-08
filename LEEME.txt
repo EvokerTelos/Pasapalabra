@@ -1,0 +1,34 @@
+# Pasapalabra - Parentalidad Positiva
+
+## Cómo usarlo en Visual Studio Code
+
+1. Descomprime la carpeta completa.
+2. Abre Visual Studio Code.
+3. Selecciona: Archivo > Abrir carpeta.
+4. Abre la carpeta `Pasapalabra_Parentalidad_Positiva_VSCode`.
+5. Instala la extensión `Live Server`.
+6. Abre `pasapalabra.html`.
+7. Haz clic derecho y selecciona `Open with Live Server`.
+
+## Cómo modificar palabras y definiciones
+
+Abre el archivo:
+
+`preguntas.json`
+
+Cada letra tiene este formato:
+
+```json
+"A": {
+  "word": "apego",
+  "definition": "Empieza con A: vínculo afectivo seguro."
+}
+```
+
+Modifica `word` y `definition`, guarda el archivo con CTRL + S y vuelve a cargar el navegador.
+
+## Importante
+
+- La respuesta debe ser una sola palabra.
+- No cambies los nombres de los archivos dentro de `assets`.
+- Mantén `pasapalabra.html`, `preguntas.json` y la carpeta `assets` juntos.
